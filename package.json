@@ -10,7 +10,7 @@
     "start:api": "pnpm --filter @voice-repo/api start",
     "start:agent": "pnpm --filter @voice-repo/agent start",
     "start:worker": "pnpm --filter @voice-repo/worker start",
-    "build:agent": "pnpm --filter @voice-repo/agent typecheck",
+    "build:agent": "pnpm --filter @voice-repo/agent build",
     "test:agent": "pnpm --filter @voice-repo/agent test"
   },
   "engines": {

@@ -1,0 +1,33 @@
+# Dependencies and build output
+node_modules/
+**/node_modules/
+dist/
+build/
+coverage/
+.vite/
+
+# Tests
+**/*.test.ts
+**/*.spec.ts
+**/*.integration.test.ts
+apps/agent/src/test/
+
+# Environment
+.env
+.env.*
+
+# Logs and caches
+*.log
+.cache/
+*.tsbuildinfo
+
+# VCS, editor, OS
+.git
+.gitignore
+.idea/
+.vscode/
+.DS_Store
+terminals/
+
+# Docs
+README.md
