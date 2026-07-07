@@ -34,7 +34,7 @@ RUN pnpm exec livekit-agents download-files
 RUN pnpm build
 
 WORKDIR /app
-RUN pnpm prune --prod
+RUN pnpm --filter @voice-repo/agent deploy --prod --legacy /app/deployed
 
 FROM base
 
@@ -47,9 +47,9 @@ RUN adduser \
   --uid "${UID}" \
   appuser
 
-WORKDIR /app/apps/agent
+WORKDIR /app
 
-COPY --from=build --chown=appuser:appuser /app /app
+COPY --from=build --chown=appuser:appuser /app/deployed /app
 
 USER appuser
 
