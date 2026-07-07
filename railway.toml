@@ -4,6 +4,7 @@
 # not Railway (root Dockerfile is for `lk agent deploy` only).
 [build]
 builder = "NIXPACKS"
+dockerfilePath = ""
 buildCommand = "pnpm install --frozen-lockfile"
 
 [deploy]

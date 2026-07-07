@@ -10,7 +10,7 @@ RUN apt-get update -qq \
   && apt-get install --no-install-recommends -y ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g pnpm@10
+RUN npm install -g pnpm@10.0.0
 
 FROM base AS build
 
@@ -33,9 +33,6 @@ WORKDIR /app/apps/agent
 RUN pnpm exec livekit-agents download-files
 RUN pnpm build
 
-WORKDIR /app
-RUN pnpm --filter @voice-repo/agent deploy --prod --legacy /app/deployed
-
 FROM base
 
 ARG UID=10001
@@ -47,9 +44,9 @@ RUN adduser \
   --uid "${UID}" \
   appuser
 
-WORKDIR /app
+WORKDIR /app/apps/agent
 
-COPY --from=build --chown=appuser:appuser /app/deployed /app
+COPY --from=build --chown=appuser:appuser /app /app
 
 USER appuser
 
