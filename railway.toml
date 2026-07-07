@@ -1,14 +1,11 @@
-# Default Railway config when the repo root is used as a service.
-# Prefer separate services with apps/api/railway.toml, apps/web/railway.toml,
-# and packages/worker/railway.toml. Deploy the LiveKit agent to LiveKit Cloud,
-# not Railway (root Dockerfile is for `lk agent deploy` only).
+# Root Railway service config for the LiveKit agent worker.
+# The agent connects to LiveKit over WebSocket and does not serve HTTP.
+# For the API, web, and pg-boss worker, use the per-package railway.toml files.
 [build]
 builder = "NIXPACKS"
 dockerfilePath = ""
-buildCommand = "pnpm install --frozen-lockfile"
+buildCommand = "pnpm install --frozen-lockfile && pnpm --filter @voice-repo/agent build"
 
 [deploy]
-startCommand = "pnpm --filter @voice-repo/api start"
-healthcheckPath = "/health"
-healthcheckTimeout = 120
+startCommand = "pnpm --filter @voice-repo/agent start"
 restartPolicyType = "ON_FAILURE"
