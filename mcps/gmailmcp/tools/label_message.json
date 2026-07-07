@@ -1,0 +1,25 @@
+{
+  "name": "label_message",
+  "description": "Adds one or more labels to a specific message in the authenticated user's Gmail account.\n\nTo find the message ID, use tools like `search_threads` or `get_thread`. If unsure of a user label's ID, use the `list_labels` tool first to discover available labels and their IDs.\n",
+  "inputSchema": {
+    "description": "Request message for LabelMessage RPC.",
+    "properties": {
+      "labelIds": {
+        "description": "Required. The IDs of the labels to add. Can be a system label ID (e.g., 'INBOX', 'TRASH', 'SPAM', 'STARRED', 'UNREAD', 'IMPORTANT') or a user-defined label ID. The tool accepts `label_ids` and not label names. Use the list_labels tool to get the corresponding label id to a display name for user-defined labels.",
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "messageId": {
+        "description": "Required. The ID of the message to add the labels to.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "messageId",
+      "labelIds"
+    ],
+    "type": "object"
+  }
+}

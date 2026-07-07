@@ -1,0 +1,27 @@
+{
+  "name": "@voice-repo/agent",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:integration": "vitest run src/agent.integration.test.ts",
+    "dev": "node src/main.ts dev",
+    "start": "node src/main.ts start"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@livekit/agents": "^1.4.7",
+    "dotenv": "^17.4.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@neondatabase/serverless": "^1.1.0",
+    "@types/node": "^24.10.1",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}

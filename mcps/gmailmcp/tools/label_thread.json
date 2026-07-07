@@ -1,0 +1,25 @@
+{
+  "name": "label_thread",
+  "description": "Adds labels to an entire thread in the authenticated user's Gmail account. This operation affects all messages currently in the thread and any future messages added to it.\n\nIf unsure of the thread ID, use the `search_threads` tool first.\n\nIf unsure of a user label's ID, use the `list_labels` tool first to discover available labels and their IDs.\n",
+  "inputSchema": {
+    "description": "Request message for LabelThread RPC.",
+    "properties": {
+      "labelIds": {
+        "description": "Required. The unique identifiers of the labels to add. Can be a system label ID (e.g., 'INBOX', 'TRASH', 'SPAM', 'STARRED', 'UNREAD', 'IMPORTANT') or a user-defined label ID. The tool accepts `label_ids` and not label names. Use the list_labels tool to get the corresponding label id to a display name for user-defined labels.",
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "threadId": {
+        "description": "Required. The unique identifier of the thread to add labels to.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "threadId",
+      "labelIds"
+    ],
+    "type": "object"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "list_labels",
+  "description": "Lists all user-defined labels available in the authenticated user's Gmail account. Use this tool to discover the `id` of a user label before calling `label_thread`, `unlabel_thread`, `label_message`, or `unlabel_message`. System labels are not returned by this tool but can be used with their well-known IDs: 'INBOX', 'TRASH', 'SPAM', 'STARRED', 'UNREAD', 'IMPORTANT', 'CHAT', 'DRAFT', 'SENT'.",
+  "inputSchema": {
+    "description": "Request message for ListLabels RPC.",
+    "properties": {
+      "pageSize": {
+        "description": "Optional. The maximum number of labels to return.",
+        "format": "int32",
+        "type": "integer"
+      },
+      "pageToken": {
+        "description": "Optional. Page token to retrieve a specific page of results in the list.",
+        "type": "string"
+      }
+    },
+    "type": "object"
+  }
+}

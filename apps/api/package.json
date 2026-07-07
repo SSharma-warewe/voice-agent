@@ -1,0 +1,17 @@
+{
+  "name": "@voice-repo/api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "@voice-repo/livekit": "workspace:*",
+    "@neondatabase/serverless": "^1.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^5.0.1"
+  }
+}

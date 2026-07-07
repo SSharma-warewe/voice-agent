@@ -1,0 +1,12 @@
+{
+  "name": "@voice-repo/livekit",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "dependencies": {
+    "livekit-server-sdk": "^2.16.0"
+  }
+}

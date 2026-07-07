@@ -1,0 +1,33 @@
+{
+  "name": "get_thread",
+  "description": "Retrieves a specific email thread from the authenticated user's Gmail account, including a list of its messages.\n\nThe `message_format` parameter controls the format of the messages returned. By default (or with `FULL_CONTENT`), it returns the full content of messages. Use `MINIMAL` to include only subject and snippet (excluding body). Use `METADATA_ONLY` to exclude subject, snippet, body, and attachment filenames. \n",
+  "inputSchema": {
+    "description": "Request message for GetThread RPC.",
+    "properties": {
+      "messageFormat": {
+        "description": "Optional. Specifies the format of the messages returned within the thread. Defaults to FULL_CONTENT. Note: If you need body content or attachments, use FULL_CONTENT. When using MINIMAL, the plaintext_body and attachment_ids fields will not be populated. If you are unsure which format to use, rely on the default behavior by using FULL_CONTENT.",
+        "enum": [
+          "MESSAGE_FORMAT_UNSPECIFIED",
+          "MINIMAL",
+          "FULL_CONTENT",
+          "METADATA_ONLY"
+        ],
+        "type": "string",
+        "x-google-enum-descriptions": [
+          "Defaults to FULL_CONTENT.",
+          "Returns message snippets and key headers (Subject, From, To, Cc, Date).",
+          "Returns all information in \"MINIMAL\" plus the full body content of each message.",
+          "Metadata only: does not include subject, snippet, body, attachment filenames."
+        ]
+      },
+      "threadId": {
+        "description": "Required. The unique identifier of the thread to fetch.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "threadId"
+    ],
+    "type": "object"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "voice-repo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev:api": "pnpm --filter @voice-repo/api dev",
+    "dev:agent": "pnpm --filter @voice-repo/agent dev",
+    "dev:worker": "pnpm --filter @voice-repo/worker dev",
+    "dev:web": "pnpm --filter @voice-repo/web dev",
+    "start:api": "pnpm --filter @voice-repo/api start",
+    "start:agent": "pnpm --filter @voice-repo/agent start",
+    "start:worker": "pnpm --filter @voice-repo/worker start",
+    "build:agent": "pnpm --filter @voice-repo/agent typecheck",
+    "test:agent": "pnpm --filter @voice-repo/agent test"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=10.0.0"
+  }
+}
