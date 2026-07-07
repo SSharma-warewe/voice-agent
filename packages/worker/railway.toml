@@ -1,5 +1,6 @@
 [build]
 builder = "NIXPACKS"
+dockerfilePath = ""
 buildCommand = "pnpm install --frozen-lockfile"
 
 [deploy]

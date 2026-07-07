@@ -7,10 +7,12 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "vite preview --host 0.0.0.0"
+    "start": "serve dist -s -l tcp://0.0.0.0:${PORT:-4173}",
+    "start:internal": "serve dist -s -l tcp://0.0.0.0:4173"
   },
   "dependencies": {
     "@livekit/components-react": "^2.9.9",
+    "serve": "^14.2.4",
     "livekit-client": "^2.15.4",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

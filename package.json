@@ -11,11 +11,17 @@
     "start:api": "pnpm --filter @voice-repo/api start",
     "start:agent": "pnpm --filter @voice-repo/agent start",
     "start:worker": "pnpm --filter @voice-repo/worker start",
+    "start:web": "pnpm --filter @voice-repo/web start",
+    "start:all": "concurrently -k -n api,web,worker,agent \"pnpm start:api\" \"pnpm --filter @voice-repo/web run start:internal\" \"pnpm start:worker\" \"pnpm start:agent\"",
     "build:agent": "pnpm --filter @voice-repo/agent build",
+    "build:web": "pnpm --filter @voice-repo/web build",
     "test:agent": "pnpm --filter @voice-repo/agent test"
   },
   "engines": {
     "node": ">=20.0.0",
     "pnpm": ">=10.0.0"
+  },
+  "dependencies": {
+    "concurrently": "^9.2.1"
   }
 }

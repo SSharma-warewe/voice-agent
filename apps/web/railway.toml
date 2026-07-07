@@ -1,5 +1,6 @@
 [build]
 builder = "NIXPACKS"
+dockerfilePath = ""
 buildCommand = "pnpm install --frozen-lockfile && pnpm --filter @voice-repo/web build"
 
 [deploy]

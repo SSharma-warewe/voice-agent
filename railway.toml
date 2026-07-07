@@ -1,11 +1,16 @@
-# Root Railway service config for the LiveKit agent worker.
-# The agent connects to LiveKit over WebSocket and does not serve HTTP.
-# For the API, web, and pg-boss worker, use the per-package railway.toml files.
+# Root Railway service — builds and starts all 4 processes in one container.
+# API binds to PORT (Railway health check). Web runs internally on 4173.
+# For production, prefer separate services using the per-package railway.toml files:
+#   /apps/api/railway.toml
+#   /apps/web/railway.toml
+#   /packages/worker/railway.toml
 [build]
 builder = "NIXPACKS"
 dockerfilePath = ""
-buildCommand = "pnpm install --frozen-lockfile && pnpm --filter @voice-repo/agent build"
+buildCommand = "pnpm install --frozen-lockfile && pnpm --filter @voice-repo/agent build && pnpm --filter @voice-repo/web build"
 
 [deploy]
-startCommand = "pnpm --filter @voice-repo/agent start"
+startCommand = "pnpm start:all"
+healthcheckPath = "/health"
+healthcheckTimeout = 120
 restartPolicyType = "ON_FAILURE"
