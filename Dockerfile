@@ -14,6 +14,8 @@ RUN npm install -g pnpm@10
 
 FROM base AS build
 
+ENV CI=true
+
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
