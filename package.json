@@ -2,6 +2,7 @@
   "name": "voice-repo",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "pnpm@10.0.0",
   "scripts": {
     "dev:api": "pnpm --filter @voice-repo/api dev",
     "dev:agent": "pnpm --filter @voice-repo/agent dev",

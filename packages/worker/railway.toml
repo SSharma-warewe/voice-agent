@@ -1,0 +1,7 @@
+[build]
+builder = "NIXPACKS"
+buildCommand = "pnpm install --frozen-lockfile"
+
+[deploy]
+startCommand = "pnpm --filter @voice-repo/worker start"
+restartPolicyType = "ON_FAILURE"

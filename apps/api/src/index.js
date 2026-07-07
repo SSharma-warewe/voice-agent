@@ -29,7 +29,7 @@ const { validateAppointment, validateBatchRequest } = await import(
 
 const TERMINAL_STATUSES = new Set(["CONFIRMED", "DECLINED", "RESCHEDULED"]);
 
-const SERVER_PORT = process.env.SERVER_PORT || 6080;
+const SERVER_PORT = Number(process.env.PORT ?? process.env.SERVER_PORT ?? 6080);
 
 const app = express();
 
@@ -380,6 +380,6 @@ app.post("/appointments", async (req, res) => {
 
 await initDb();
 
-app.listen(SERVER_PORT, () => {
-  console.log(`API server running on http://localhost:${SERVER_PORT}`);
+app.listen(SERVER_PORT, "0.0.0.0", () => {
+  console.log(`API server running on http://0.0.0.0:${SERVER_PORT}`);
 });
