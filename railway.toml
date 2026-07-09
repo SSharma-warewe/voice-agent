@@ -1,16 +1,12 @@
-# Root Railway service — builds and starts all 4 processes in one container.
-# API binds to PORT (Railway health check). Web runs internally on 4173.
-# For production, prefer separate services using the per-package railway.toml files:
-#   /apps/api/railway.toml
-#   /apps/web/railway.toml
-#   /packages/worker/railway.toml
+# Shared monorepo image. Each Railway service sets SERVICE_ROLE:
+#   api | web | worker | agent | agent-lead | agent-booking | web-api | worker-agents | all
+# Public traffic should hit the web service domain (proxies /api + /health).
+# DATABASE_URL must point at Neon production (neondb) — set in Railway env.
+
 [build]
-builder = "NIXPACKS"
-dockerfilePath = ""
-buildCommand = "pnpm install --frozen-lockfile && pnpm --filter @voice-repo/agent build && pnpm --filter @voice-repo/web build"
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "pnpm start:all"
-healthcheckPath = "/health"
-healthcheckTimeout = 120
+startCommand = "pnpm start:railway"
 restartPolicyType = "ON_FAILURE"

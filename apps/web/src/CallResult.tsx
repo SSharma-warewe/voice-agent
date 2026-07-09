@@ -1,6 +1,13 @@
 import type { Appointment, CallLog } from "./api";
 import { formatDuration } from "./api";
 
+const TERMINAL_STATUSES = new Set([
+  "CONFIRMED",
+  "DECLINED",
+  "RESCHEDULED",
+  "ABANDONED",
+]);
+
 interface CallResultProps {
   appointment: Appointment;
   call: CallLog | null;
@@ -13,12 +20,20 @@ const OUTCOME_COPY: Record<string, { title: string; description: string }> = {
     description: "The patient confirmed they will attend.",
   },
   DECLINED: {
-    title: "Appointment declined",
+    title: "Appointment canceled",
     description: "The patient will not attend this appointment.",
   },
   RESCHEDULED: {
     title: "Appointment rescheduled",
     description: "The appointment was moved to a new date and time.",
+  },
+  ABANDONED: {
+    title: "Call abandoned",
+    description: "The call ended without a confirmed outcome and was taken off the queue.",
+  },
+  NO_ANSWER: {
+    title: "No answer",
+    description: "The patient did not join. The slot was freed for the next call.",
   },
 };
 
@@ -33,13 +48,30 @@ function transcriptSnippet(call: CallLog | null): string | null {
 }
 
 export default function CallResult({ appointment, call, onDone }: CallResultProps) {
-  const outcome = OUTCOME_COPY[appointment.status];
-  const isTerminal = !!outcome;
+  // Prefer appointment terminal status. Only use call.outcome when the call
+  // actually completed — never a stale COMPLETED/CONFIRMED from an older mock
+  // or prior attempt while the appointment is still CALLING/PENDING.
+  let effectiveStatus = appointment.status;
+  if (TERMINAL_STATUSES.has(appointment.status as any)) {
+    effectiveStatus = appointment.status;
+  } else if (call?.status === "COMPLETED" && call.outcome) {
+    effectiveStatus = call.outcome;
+  } else if (
+    call?.status === "ABANDONED" ||
+    call?.status === "NO_ANSWER" ||
+    call?.status === "FAILED"
+  ) {
+    effectiveStatus = call.status;
+  }
+
+  const outcome = OUTCOME_COPY[effectiveStatus] || OUTCOME_COPY[appointment.status];
+  const isTerminal = !!OUTCOME_COPY[effectiveStatus];
   const snippet = transcriptSnippet(call);
 
+  const displayStatus = effectiveStatus || appointment.status;
   return (
     <main className="app">
-      <section className={`result-card result-${appointment.status.toLowerCase()}`}>
+      <section className={`result-card result-${displayStatus.toLowerCase()}`}>
         <p className="result-eyebrow">Call complete</p>
         <h1>{isTerminal ? outcome.title : "Call ended"}</h1>
         <p className="result-copy">
@@ -67,7 +99,7 @@ export default function CallResult({ appointment, call, onDone }: CallResultProp
           </div>
           <div>
             <dt>Status</dt>
-            <dd className="result-status">{appointment.status}</dd>
+            <dd className="result-status">{effectiveStatus}</dd>
           </div>
           {call && (
             <div>

@@ -10,16 +10,28 @@ import {
   fetchCalls,
   fetchCallStats,
   joinAppointment,
+  fetchLeads,
+  fetchCampaigns,
+  joinLead,
+  fetchLeadCall,
+  startInboundBooking,
+  startConfirmationQueue,
+  startLeadQueue,
+  uploadCampaign,
   type Appointment,
   type CallLog,
   type CallStats,
   type JoinResponse,
+  type Lead,
+  type Campaign,
 } from "./api";
 
 export default function AgentDashboard() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [calls, setCalls] = useState<CallLog[]>([]);
   const [stats, setStats] = useState<CallStats | null>(null);
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [joiningId, setJoiningId] = useState<string | null>(null);
@@ -34,14 +46,18 @@ export default function AgentDashboard() {
   const loadDashboard = useCallback(async () => {
     try {
       setError(null);
-      const [rows, callRows, callStats] = await Promise.all([
+      const [rows, callRows, callStats, leadRows, campRows] = await Promise.all([
         fetchAppointments(),
         fetchCalls(),
         fetchCallStats(),
+        fetchLeads().catch(() => [] as Lead[]),
+        fetchCampaigns().catch(() => [] as Campaign[]),
       ]);
       setAppointments(rows);
       setCalls(callRows);
       setStats(callStats);
+      setLeads(leadRows);
+      setCampaigns(campRows);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load dashboard");
     } finally {
@@ -72,16 +88,90 @@ export default function AgentDashboard() {
     }
   }
 
-  async function handleLeaveCall(appointmentId: string) {
+  async function handleJoinLead(leadId: string) {
+    try {
+      setJoiningId(leadId);
+      setError(null);
+      const join = await joinLead(leadId);
+      setActiveJoin(join);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to join lead call");
+    } finally {
+      setJoiningId(null);
+    }
+  }
+
+  async function handleStartBooking() {
+    try {
+      setJoiningId("booking");
+      setError(null);
+      const join = await startInboundBooking();
+      setActiveJoin(join);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to start booking call");
+    } finally {
+      setJoiningId(null);
+    }
+  }
+
+  async function handleStartConfirmationQueue() {
+    try {
+      setError(null);
+      const result = await startConfirmationQueue();
+      if (!result.started) {
+        setError(result.message || result.reason || "Could not start confirmation queue");
+      } else {
+        setError(null);
+      }
+      void loadDashboard();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to start confirmation queue");
+    }
+  }
+
+  async function handleStartLeadQueue() {
+    try {
+      setError(null);
+      const result = await startLeadQueue();
+      if (!result.started) {
+        setError(result.message || result.reason || "Could not start lead queue");
+      } else {
+        setError(null);
+      }
+      void loadDashboard();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to start lead queue");
+    }
+  }
+
+  async function handleLeaveCall(appointmentIdOrRoom?: string) {
     setActiveJoin(null);
     setLoadingResult(true);
     setError(null);
     try {
-      const [appointment, call] = await Promise.all([
-        fetchAppointmentOutcome(appointmentId),
-        fetchCallByAppointment(appointmentId),
-      ]);
-      setCallResult({ appointment, call });
+      // Booking / lead / failed connect: skip fake result page.
+      const isRealAppointment =
+        appointmentIdOrRoom &&
+        !appointmentIdOrRoom.startsWith("demo-") &&
+        !appointmentIdOrRoom.includes("booking") &&
+        !appointmentIdOrRoom.startsWith("call-lead") &&
+        !appointmentIdOrRoom.startsWith("call-book");
+
+      if (isRealAppointment) {
+        const [appointment, call] = await Promise.all([
+          fetchAppointmentOutcome(appointmentIdOrRoom).catch(() => null as any),
+          fetchCallByAppointment(appointmentIdOrRoom).catch(() => null),
+        ]);
+        // Only show result when something actually resolved (or call ended).
+        // Avoid jumping to a stale "confirmed" page when join never connected.
+        const terminalAppt = appointment && ["CONFIRMED", "DECLINED", "RESCHEDULED", "ABANDONED"].includes(appointment.status);
+        const terminalCall =
+          call &&
+          ["COMPLETED", "ABANDONED", "NO_ANSWER", "FAILED"].includes(call.status);
+        if (appointment && (terminalAppt || terminalCall)) {
+          setCallResult({ appointment, call });
+        }
+      }
       void loadDashboard();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load call result");
@@ -126,10 +216,11 @@ export default function AgentDashboard() {
   }
 
   if (activeJoin) {
+    const leaveId = activeJoin.appointment?.appointmentId || activeJoin.roomName;
     return (
       <CallRoom
         join={activeJoin}
-        onLeave={() => void handleLeaveCall(activeJoin.appointment.appointmentId)}
+        onLeave={() => void handleLeaveCall(leaveId)}
       />
     );
   }
@@ -139,11 +230,21 @@ export default function AgentDashboard() {
       appointments={appointments}
       calls={calls}
       stats={stats}
+      leads={leads}
+      campaigns={campaigns}
       loading={loading}
       error={error}
       joiningId={joiningId}
       onJoin={(appointmentId) => void handleJoin(appointmentId)}
+      onJoinLead={(leadId) => void handleJoinLead(leadId)}
+      onStartBooking={() => void handleStartBooking()}
+      onStartConfirmationQueue={() => void handleStartConfirmationQueue()}
+      onStartLeadQueue={() => void handleStartLeadQueue()}
       onSelectCall={setSelectedCall}
+      onUploadCampaign={async (p) => {
+        await uploadCampaign(p);
+        void loadDashboard();
+      }}
     />
   );
 }

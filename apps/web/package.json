@@ -7,16 +7,16 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "serve dist -s -l tcp://0.0.0.0:${PORT:-4173}",
-    "start:internal": "serve dist -s -l tcp://0.0.0.0:4173"
+    "start": "node server.mjs"
   },
   "dependencies": {
     "@livekit/components-react": "^2.9.9",
-    "serve": "^14.2.4",
+    "http-proxy": "^1.18.1",
     "livekit-client": "^2.15.4",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "react-router-dom": "^7.18.1"
+    "react-router-dom": "^7.18.1",
+    "serve-handler": "^6.1.6"
   },
   "devDependencies": {
     "@types/react": "^19.1.12",

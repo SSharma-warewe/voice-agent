@@ -44,7 +44,7 @@ flowchart LR
 **Call flow**
 
 1. Appointments are created via the API (`PENDING` status).
-2. The worker polls for pending appointments and enqueues confirmation calls (up to `MAX_CONCURRENT_CALLS` at a time).
+2. The worker polls for pending appointments and leads and enqueues outbound calls (up to 1 confirmation + 1 lead at a time by default; inbound booking is separate).
 3. For each call, the worker creates a LiveKit room and dispatches the appointment-confirmation agent.
 4. The agent waits for the patient to join before starting STT/TTS inference.
 5. The patient joins from the web dashboard; the agent confirms, reschedules, or declines the appointment.
@@ -94,7 +94,9 @@ flowchart LR
    | `API_URL` | Agent | Base URL for agent → API callbacks |
    | `VITE_API_URL` | Web | API base path (`/api` in dev via Vite proxy) |
    | `WORKER_POLL_INTERVAL_MS` | Worker | How often to poll for pending appointments (default `30000`) |
-   | `MAX_CONCURRENT_CALLS` | Worker | Max simultaneous active calls (default `3`) |
+   | `MAX_CONCURRENT_CALLS` | Worker | Max simultaneous outbound calls (default `2`) |
+| `MAX_CONFIRMATION_CALLS` | Worker | Max concurrent confirmation calls (default `1`) |
+| `MAX_LEAD_CALLS` | Worker | Max concurrent lead calls (default `1`) |
 
 3. **Seed a demo appointment (optional)**
 
@@ -219,7 +221,15 @@ The worker uses [pg-boss](https://github.com/timgit/pg-boss) with two queues:
 - **`fetch-appointments`** — polls for `PENDING` appointments without a room and enqueues call jobs
 - **`start-confirmation-call`** — creates a LiveKit room, marks the appointment `CALLING`, and records the call
 
-Concurrency is capped by `MAX_CONCURRENT_CALLS` (default 3). Additional pending appointments wait until active call slots free up.
+Concurrency is applied **only to outbound calls** managed by the worker queues:
+
+- **Confirmation** — up to `MAX_CONFIRMATION_CALLS` (default `1`)
+- **Lead outreach** — up to `MAX_LEAD_CALLS` (default `1`)
+- **Total outbound** — also capped by `MAX_CONCURRENT_CALLS` (default `2`)
+
+When a call resolves as confirmed, rescheduled, canceled (`DECLINED`), abandoned, or no-answer, the appointment/lead leaves `CALLING` and the slot is freed for the next pending item.
+
+The inbound booking agent is kept separate from the queue: started directly via `POST /booking/start`, no pg-boss involvement, not counted in worker active slots. Run its agent process independently (`pnpm dev:agent:booking`).
 
 ### Utility scripts
 
@@ -269,10 +279,11 @@ In development, Vite proxies `/api` requests to the Express API on port 6080.
 | Status | Description |
 |--------|-------------|
 | `PENDING` | Awaiting worker pickup |
-| `CALLING` | LiveKit room created, call in progress |
+| `CALLING` | LiveKit room created, call in progress (holds an outbound slot) |
 | `CONFIRMED` | Patient confirmed the appointment |
-| `DECLINED` | Patient declined |
+| `DECLINED` | Patient canceled / declined |
 | `RESCHEDULED` | Patient rescheduled to a new date/time |
+| `ABANDONED` | Call abandoned or no-answer; off the queue (slot freed) |
 
 ## Troubleshooting
 
@@ -280,6 +291,25 @@ In development, Vite proxies `/api` requests to the Express API on port 6080.
 - **Appointments stuck in `CALLING`** — Run `reset-stuck-calls.mjs` to reset state and purge queues.
 - **Too many concurrent calls** — Lower `MAX_CONCURRENT_CALLS` or wait for active calls to complete.
 - **Web proxy errors on startup** — Start the API before the web app; proxy errors are transient while the API boots.
+
+## Lead Outreach Agent (new)
+
+Second agent: `lead-outreach-agent`.
+
+Usage:
+1. In web, select "Lead Outreach & Booking".
+2. Enter a script (instructions for the agent) + CSV of leads (`name,phone`).
+3. Upload → creates Campaign + Leads.
+4. Worker enqueues lead calls (separate queue).
+5. Agent follows script + uses `bookAppointment` tool to create appointments in DB on success.
+
+Start both agents in dev:
+```
+pnpm dev:agent
+pnpm dev:agent:lead
+```
+
+New tables: `campaigns`, `leads`. Calls support `lead_id`. Appointments created by the booking tool.
 
 ## License
 

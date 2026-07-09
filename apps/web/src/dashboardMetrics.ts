@@ -17,6 +17,7 @@ export interface PipelineCounts {
   confirmed: number;
   declined: number;
   rescheduled: number;
+  abandoned: number;
 }
 
 export interface DashboardMetrics {
@@ -53,6 +54,7 @@ export function computeDashboardMetrics(
     confirmed: 0,
     declined: 0,
     rescheduled: 0,
+    abandoned: 0,
   };
 
   for (const row of appointments) {
@@ -71,6 +73,9 @@ export function computeDashboardMetrics(
         break;
       case "RESCHEDULED":
         pipeline.rescheduled += 1;
+        break;
+      case "ABANDONED":
+        pipeline.abandoned += 1;
         break;
       default:
         break;

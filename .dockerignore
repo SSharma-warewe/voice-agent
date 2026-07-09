@@ -11,10 +11,13 @@ coverage/
 **/*.spec.ts
 **/*.integration.test.ts
 apps/agent/src/test/
+apps/agent/src/**/test/
 
 # Environment
 .env
 .env.*
+**/.env
+**/.env.local
 
 # Logs and caches
 *.log
@@ -27,7 +30,16 @@ apps/agent/src/test/
 .idea/
 .vscode/
 .DS_Store
+.grok
 terminals/
 
-# Docs
-README.md
+# Local-only / design artifacts
+*.md
+**/*.zip
+**/mcps
+nylas-*.mjs
+test-avail.mjs
+runw.bat
+packages/worker/test-w.mjs
+Landing Page - Standalone.html
+apps/web/create a landing and login page for this site , its a call automation site ( bot.zip

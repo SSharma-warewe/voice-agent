@@ -1,25 +1,28 @@
 :root {
-  color-scheme: dark;
-  font-family: "IBM Plex Sans", sans-serif;
+  color-scheme: light;
+  font-family: "Libre Franklin", sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color: #dce3ea;
-  background: #080c12;
+  color: #0a0a0a;
+  background: #ffffff;
 
-  --bg-base: #080c12;
-  --bg-surface: #0f151e;
-  --bg-elevated: #151d28;
-  --border: #243040;
-  --border-strong: #334155;
-  --text-muted: #8b9aab;
-  --text-dim: #5c6b7a;
-  --accent-live: #f0a500;
-  --accent-primary: #3d9eff;
-  --accent-positive: #2dd4a8;
-  --accent-negative: #e85d5d;
-  --accent-info: #7eb8ff;
-  --accent-warn: #ffd166;
-  --font-display: "Bricolage Grotesque", sans-serif;
+  --bg-base: #ffffff;
+  --bg-surface: #fafafa;
+  --bg-elevated: #f5f5f5;
+  --border: #e5e5e5;
+  --border-strong: #d4d4d4;
+  --text-muted: #525252;
+  --text-dim: #737373;
+  --accent-yellow: #fef3c7;
+  --accent-yellow-strong: #fde68a;
+  --accent-yellow-text: #854d0e;
+  --accent-live: #ca8a04;
+  --accent-primary: #0a0a0a;
+  --accent-positive: #166534;
+  --accent-negative: #991b1b;
+  --accent-info: #1e3a5f;
+  --accent-warn: #a16207;
+  --font-display: "Syne", sans-serif;
 }
 
 * {
@@ -29,14 +32,13 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(61, 158, 255, 0.08), transparent),
-    var(--bg-base);
+  background: var(--bg-base);
 }
 
 button {
   font: inherit;
   cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 button:disabled {
@@ -44,7 +46,14 @@ button:disabled {
   cursor: not-allowed;
 }
 
-h1, h2, h3 {
+button:focus-visible,
+a:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(202, 138, 4, 0.25);
+  border-radius: 6px;
+}
+
+h1, h2, h3, h4 {
   font-family: var(--font-display);
   font-weight: 700;
   letter-spacing: -0.02em;

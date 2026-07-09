@@ -7,9 +7,9 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc -p tsconfig.build.json",
     "test": "vitest run",
-    "test:integration": "vitest run src/agent.integration.test.ts",
-    "dev": "node --experimental-strip-types src/main.ts dev",
-    "start": "node dist/main.js start"
+    "test:integration": "vitest run src/confirmation/agent.integration.test.ts",
+    "dev": "node src/confirmation/main.ts dev",
+    "start": "node src/confirmation/main.ts start"
   },
   "engines": {
     "node": ">=20.0.0"
